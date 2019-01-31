@@ -3,19 +3,18 @@ import csv
 class Company:
     ratingByMonthYear = dict()
 
-# TODO: rename ratings to score. Refactoring tool not working rn
 class Month:
-    ratingsAllSum = 0
-    ratingsAllCount = 0
-    ratingsAll = 0.0
+    scoreAllSum = 0
+    scoreAllCount = 0
+    scoreAll = 0.0
 
-    ratingsCurrentOnlySum = 0
-    ratingsCurrentOnlyCount = 0
-    ratingsCurrentOnly = 0.0
+    scoreCurrentOnlySum = 0
+    scoreCurrentOnlyCount = 0
+    scoreCurrentOnly = 0.0
 
-    ratingsFormerOnlySum = 0
-    ratingsFormerOnlyCount = 0
-    ratingsFormerOnly = 0.0
+    scoreFormerOnlySum = 0
+    scoreFormerOnlyCount = 0
+    scoreFormerOnly = 0.0
 
 class Rating:
     company = str()
@@ -37,11 +36,11 @@ def formatAndPrintScoreSummary():
             printMonthScore(company, date)
 
 def calculateAverages(month):
-        month.ratingsAll = calculateAverage(month.ratingsAllSum, month.ratingsAllCount)
-        month.ratingsCurrentOnly = calculateAverage(month.ratingsCurrentOnlySum, 
-                                                    month.ratingsCurrentOnlyCount)
-        month.ratingsFormalOnly = calculateAverage(month.ratingsFormerOnlySum, 
-                                                    month.ratingsFormerOnlyCount)
+        month.scoreAll = calculateAverage(month.scoreAllSum, month.scoreAllCount)
+        month.scoreCurrentOnly = calculateAverage(month.scoreCurrentOnlySum, 
+                                                    month.scoreCurrentOnlyCount)
+        month.ratingsFormalOnly = calculateAverage(month.scoreFormerOnlySum, 
+                                                    month.scoreFormerOnlyCount)
 
 def calculateAverage(totalSum, count):
     return float(totalSum) / count if count != 0 else 0
@@ -51,8 +50,18 @@ def printHeader():
 
 def printMonthScore(company, date):
     month = companies[company].ratingByMonthYear[date]
-    print("{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company, date, month.ratingsAll, 
-                                        month.ratingsCurrentOnly, month.ratingsFormalOnly))
+    print("{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company, date, month.scoreAll, 
+                                        month.scoreCurrentOnly, month.ratingsFormalOnly))
+
+def writeResultsCSV():
+    flOut = open('summary_employee_reviews.csv', 'w')
+    dataOut = csv.writer(flOut, delimiter=',')
+    dataOut.writerow(['Company','Date','Total Score','Current Employees Score','Former EmployeesScore'])
+    for company in companies:
+        for date in companies[company].ratingByMonthYear:
+            month = companies[company].ratingByMonthYear[date]
+            dataOut.writerow([company, date, '{:.2f}'.format(month.scoreAll), 
+                '{:.2f}'.format(month.scoreCurrentOnly), '{:.2f}'.format(month.ratingsFormalOnly)])
 
 # Constants
 COMPANY_NAME = 1
@@ -60,13 +69,13 @@ REVIEW_DATE = 3
 OVERALL_SCORE = 9
 
 # Load csv
-fl = open('employee_reviews.csv', 'r')
-data = csv.reader(fl, delimiter=',')
+flIn = open('employee_reviews.csv', 'r')
+dataIn = csv.reader(flIn, delimiter=',')
 
 companies = dict()
 
-next(data)
-for row in data:
+next(dataIn)
+for row in dataIn:
     rating = Rating()
     rating.company = str(row[COMPANY_NAME])
 
@@ -88,17 +97,18 @@ for row in data:
     if rating.date not in companies[rating.company].ratingByMonthYear:
         companies[rating.company].ratingByMonthYear[rating.date] = Month()
     
-    companies[rating.company].ratingByMonthYear[rating.date].ratingsAllSum += rating.score
-    companies[rating.company].ratingByMonthYear[rating.date].ratingsAllCount += 1
+    companies[rating.company].ratingByMonthYear[rating.date].scoreAllSum += rating.score
+    companies[rating.company].ratingByMonthYear[rating.date].scoreAllCount += 1
 
     if rating.employeeStatus == 'Current':
-        companies[rating.company].ratingByMonthYear[rating.date].ratingsCurrentOnlySum += rating.score
-        companies[rating.company].ratingByMonthYear[rating.date].ratingsCurrentOnlyCount += 1
+        companies[rating.company].ratingByMonthYear[rating.date].scoreCurrentOnlySum += rating.score
+        companies[rating.company].ratingByMonthYear[rating.date].scoreCurrentOnlyCount += 1
 
     elif rating.employeeStatus == 'Former':
-        companies[rating.company].ratingByMonthYear[rating.date].ratingsFormerOnlySum += rating.score
-        companies[rating.company].ratingByMonthYear[rating.date].ratingsFormerOnlyCount += 1
+        companies[rating.company].ratingByMonthYear[rating.date].scoreFormerOnlySum += rating.score
+        companies[rating.company].ratingByMonthYear[rating.date].scoreFormerOnlyCount += 1
 
 formatAndPrintScoreSummary()
+writeResultsCSV()
 
 
