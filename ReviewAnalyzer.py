@@ -22,8 +22,11 @@ class Rating:
     rating = int()
     employeeStatus = str()
 
+def ifInvalidDate(dateRaw):
+    return dateRaw[-4:] == '0000'
+
 def extractDate(dateRaw):
-    return dateRaw[:4] + dateRaw[-2:]
+    return dateRaw[:4] + dateRaw[-4:]
 
 def extractEmployeeStatus(employeeStatusRaw):
     return employeeStatusRaw.split()[0]
@@ -46,21 +49,21 @@ def calculateAverage(totalSum, count):
     return float(totalSum) / count if count != 0 else 0
 
 def printHeader():
-    print("In the works")
+    print("Company".ljust(10)+"\tYear\tMonth\tAll\tCurrent\tFormer")
 
 def printMonthScore(company, date):
     month = companies[company].ratingByMonthYear[date]
-    print("{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company, date, month.scoreAll, 
+    print("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company.ljust(10), date[-4:], date[:4], month.scoreAll, 
                                         month.scoreCurrentOnly, month.ratingsFormalOnly))
 
 def writeResultsCSV():
     flOut = open('summary_employee_reviews.csv', 'w')
     dataOut = csv.writer(flOut, delimiter=',')
-    dataOut.writerow(['Company','Date','Total Score','Current Employees Score','Former EmployeesScore'])
+    dataOut.writerow(['Company','Year','Month','Total Score','Current Employees Score','Former Employees Score'])
     for company in companies:
         for date in companies[company].ratingByMonthYear:
             month = companies[company].ratingByMonthYear[date]
-            dataOut.writerow([company, date, '{:.2f}'.format(month.scoreAll), 
+            dataOut.writerow([company, date[-4:], date[:4], '{:.2f}'.format(month.scoreAll), 
                 '{:.2f}'.format(month.scoreCurrentOnly), '{:.2f}'.format(month.ratingsFormalOnly)])
 
 # Constants
@@ -81,13 +84,13 @@ for row in dataIn:
 
     dateRaw = str(row[REVIEW_DATE])
     
-    if dateRaw == 'None':
+    if dateRaw == 'None' or ifInvalidDate(dateRaw):
         continue
     
     rating.date = extractDate(dateRaw)
 
     rating.score = int(float(row[OVERALL_SCORE]))
-
+    
     employeeStatusRaw = str(row[4])
     rating.employeeStatus = extractEmployeeStatus(employeeStatusRaw)
 
@@ -110,5 +113,3 @@ for row in dataIn:
 
 formatAndPrintScoreSummary()
 writeResultsCSV()
-
-
