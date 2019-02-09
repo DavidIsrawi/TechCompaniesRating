@@ -1,4 +1,5 @@
 import csv
+from enum import Enum
 
 class Company:
     def __init__(self):
@@ -25,11 +26,25 @@ class Rating:
         self.rating = 0
         self.employeeStatus = ''
 
+class MonthFromStr(Enum):
+    Jan = 1
+    Feb = 2
+    Mar = 3
+    Abr = 4
+    May = 5
+    Jun = 6
+    Jul = 7
+    Aug = 8
+    Sep = 9
+    Oct = 10
+    Nov = 11
+    Dec = 12
+
 def ifInvalidDate(dateRaw):
     return dateRaw[-4:] == '0000'
 
 def extractDate(dateRaw):
-    return dateRaw[:4] + dateRaw[-4:]
+    return dateRaw[1:4] + dateRaw[-2:]
 
 def extractEmployeeStatus(employeeStatusRaw):
     return employeeStatusRaw.split()[0]
@@ -52,21 +67,21 @@ def calculateAverage(totalSum, count):
     return float(totalSum) / count if count != 0 else 0
 
 def printHeader():
-    print("Company".ljust(10)+"\tYear\tMonth\tAll\tCurrent\tFormer")
+    print("Company".ljust(10)+"\tDate\tAll\tCurrent\tFormer")
 
 def printMonthScore(company, date):
     month = companies[company].ratingByMonthYear[date]
-    print("{}\t{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company.ljust(10), date[-4:], date[:4], month.scoreAll, 
+    print("{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company.ljust(10), '{}-{}'.format(date[:3], date[-2:]), month.scoreAll, 
                                         month.scoreCurrentOnly, month.ratingsFormalOnly))
 
 def writeResultsCSV():
     flOut = open('summary_employee_reviews.csv', 'w')
     dataOut = csv.writer(flOut, delimiter=',')
-    dataOut.writerow(['Company','Year','Month','Total Score','Current Employees Score','Former Employees Score'])
+    dataOut.writerow(['Company','Date','Total','Current Employees','Former Employees'])
     for company in companies:
         for date in companies[company].ratingByMonthYear:
             month = companies[company].ratingByMonthYear[date]
-            dataOut.writerow([company, date[-4:], date[:4], '{:.2f}'.format(month.scoreAll), 
+            dataOut.writerow([company, '{}-{}'.format(date[:3], date[-2:]), '{:.2f}'.format(month.scoreAll), 
                 '{:.2f}'.format(month.scoreCurrentOnly), '{:.2f}'.format(month.ratingsFormalOnly)])
 
 # Constants
