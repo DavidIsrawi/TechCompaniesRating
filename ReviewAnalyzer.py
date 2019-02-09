@@ -1,26 +1,29 @@
 import csv
 
 class Company:
-    ratingByMonthYear = dict()
+    def __init__(self):
+        self.ratingByMonthYear = dict()
 
 class Month:
-    scoreAllSum = 0
-    scoreAllCount = 0
-    scoreAll = 0.0
+    def __init__(self):
+        self.scoreAllSum = 0
+        self.scoreAllCount = 0
+        self.scoreAll = 0.0
 
-    scoreCurrentOnlySum = 0
-    scoreCurrentOnlyCount = 0
-    scoreCurrentOnly = 0.0
+        self.scoreCurrentOnlySum = 0
+        self.scoreCurrentOnlyCount = 0
+        self.scoreCurrentOnly = 0.0
 
-    scoreFormerOnlySum = 0
-    scoreFormerOnlyCount = 0
-    scoreFormerOnly = 0.0
+        self.scoreFormerOnlySum = 0
+        self.scoreFormerOnlyCount = 0
+        self.scoreFormerOnly = 0.0
 
 class Rating:
-    company = str()
-    date = str()
-    rating = int()
-    employeeStatus = str()
+    def __init__(self):
+        self.company = ''
+        self.date = ''
+        self.rating = 0
+        self.employeeStatus = ''
 
 def ifInvalidDate(dateRaw):
     return dateRaw[-4:] == '0000'
