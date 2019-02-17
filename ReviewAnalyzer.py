@@ -30,7 +30,7 @@ class MonthFromStr(Enum):
     Jan = 1
     Feb = 2
     Mar = 3
-    Abr = 4
+    Apr = 4
     May = 5
     Jun = 6
     Jul = 7
@@ -44,7 +44,9 @@ def ifInvalidDate(dateRaw):
     return dateRaw[-4:] == '0000'
 
 def extractDate(dateRaw):
-    return dateRaw[1:4] + dateRaw[-2:]
+    month = dateRaw[1:4]
+    year = dateRaw[-2:]
+    return str(MonthFromStr[month].value) + "-" + year
 
 def extractEmployeeStatus(employeeStatusRaw):
     return employeeStatusRaw.split()[0]
@@ -71,17 +73,17 @@ def printHeader():
 
 def printMonthScore(company, date):
     month = companies[company].ratingByMonthYear[date]
-    print("{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company.ljust(10), '{}-{}'.format(date[:3], date[-2:]), month.scoreAll, 
+    print("{}\t{}\t{:.2f}\t{:.2f}\t{:.2f}".format(company.ljust(10), date.rjust(5), month.scoreAll, 
                                         month.scoreCurrentOnly, month.ratingsFormalOnly))
 
 def writeResultsCSV():
     flOut = open('summary_employee_reviews.csv', 'w')
     dataOut = csv.writer(flOut, delimiter=',')
-    dataOut.writerow(['Company','Date','Total','Current Employees','Former Employees'])
+    dataOut.writerow(['Company','Date','Total','Current Emp.','Former Emp.'])
     for company in companies:
         for date in companies[company].ratingByMonthYear:
             month = companies[company].ratingByMonthYear[date]
-            dataOut.writerow([company, '{}-{}'.format(date[:3], date[-2:]), '{:.2f}'.format(month.scoreAll), 
+            dataOut.writerow([company, date, '{:.2f}'.format(month.scoreAll), 
                 '{:.2f}'.format(month.scoreCurrentOnly), '{:.2f}'.format(month.ratingsFormalOnly)])
 
 # Constants
